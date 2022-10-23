@@ -232,7 +232,9 @@ Placeholder::Placeholder(MPSGraphTensor* mpsGraphTensor, const Tensor& src, MPSS
     if (!_tensor.has_storage()) {
       // if we cannot gather, we make the tensor contiguous implicitly, and keep
       // it in placeholder to be able to retrieve it when we return from constructor
-      _tensor = src.clone(MemoryFormat::Contiguous);
+      // have reverted bugfix here in order to undo perf regression. we now avoid cloning.
+      // https://github.com/pytorch/pytorch/issues/85297
+      _tensor = src.contiguous();
     }
     srcBuf = getMTLBufferStorage(_tensor);
   }
